@@ -19,6 +19,7 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 	private boolean sentCmd;
 	private boolean isOn;
 	private boolean display;
+	private FMapOverlay fmap;
 	
 	@Override
 	public String getName() { return "Faction Map Overlay"; }
@@ -30,6 +31,7 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 	public void init(File configPath) 
 	{
 		this.sentCmd = false;
+		this.fmap = new FMapOverlay();
 	}
 
 	@Override
@@ -52,7 +54,21 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 	{
 		if (this.sentCmd && message.matches(".*nknown.*ommand.*"))
 			return false;
-		System.out.println("Received message: \n" + message);
+		if (message.matches("§r§6_+\\.\\[.*"))
+		{
+			this.fmap.reset();
+			this.fmap.addLine(message);
+			this.fmap.doneTakingLines = false;
+		}
+		else if (this.fmap.getSize() > 0 && this.fmap.getSize() < 10
+				&& !this.fmap.doneTakingLines && message.matches("§r§[0-9a-f]?.?§r§.*"))
+			this.fmap.addLine(message);
+		else if (this.fmap.getSize() > 9 && message.matches("§r§[0-9a-f]?.?: .*")
+				&& !this.fmap.doneTakingLines)
+			this.fmap.addLine(message);
+		else
+			this.fmap.doneTakingLines = true;
+		System.out.println(message);
 		return true;
 	}
 
