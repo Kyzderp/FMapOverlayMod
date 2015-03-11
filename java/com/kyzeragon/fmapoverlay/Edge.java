@@ -21,6 +21,7 @@ public class Edge
 	
 	public void drawEdge(Tessellator tess, double y, int color)
 	{
+		GL11.glLineWidth(5.0f);
 		tess.startDrawing(GL11.GL_LINE);
 		tess.setColorRGBA_I(color, 200);
 		tess.addVertex(minX, y, minZ);

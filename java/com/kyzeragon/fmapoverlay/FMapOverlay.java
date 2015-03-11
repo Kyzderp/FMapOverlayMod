@@ -3,12 +3,17 @@ package com.kyzeragon.fmapoverlay;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
+
 public class FMapOverlay 
 {
 	public boolean doneTakingLines;
 	private LinkedList<String> lines;
 	private HashMap<Character, String> factions;
 	private Chunk[][] map;
+	private boolean isFixed;
+	private double fixedY;
 
 	public FMapOverlay() 
 	{
@@ -16,12 +21,31 @@ public class FMapOverlay
 		this.factions = new HashMap<Character, String>();
 		this.map = new Chunk[39][8];
 		this.doneTakingLines = false;
+		this.isFixed = false;
+		this.fixedY = 64;
+	}
+
+	public void drawOverlay(Tessellator tess)
+	{
+		for (int z = 0; z < 8; z++)
+		{
+			for (int x = 0; x < 39; x++)
+			{
+				if (map[x][z] != null)
+				{
+					if (this.isFixed)
+						map[x][z].shadeChunk(tess, fixedY);
+					else
+						map[x][z].shadeChunk(tess);
+				}
+			}	
+		}
 	}
 
 	public void addLine(String line)
 	{
 		lines.addLast(line);
-		//		System.out.println("Added line, size is now " + lines.size());
+		System.out.println("Added line: " + line);
 		if (lines.size() >= 10 && this.doneTakingLines)
 			this.parseMap();
 	}
@@ -30,6 +54,8 @@ public class FMapOverlay
 	{
 		if (lines.size() < 1)
 			return false;
+		this.factions.clear();
+		this.map = new Chunk[39][8];
 		///// Read the first line to get the current faction /////
 		String line = lines.get(0);
 		int originX = Integer.parseInt(line.substring(line.indexOf("(") + 1, line.indexOf(",")));
@@ -42,21 +68,50 @@ public class FMapOverlay
 		for (int i = 9; i < lines.size(); i++)
 		{ // §r§6/: SafeZone §r§f\: Kussen§r
 			line = lines.get(i);
-			line = line.replaceAll("§.?", ""); // /: SafeZone \: Kussen
+			line = line.replaceAll("§.?", ""); // /: SafeZone hi \: Kussen
+			System.out.println("Line: " + line);
 			if (line.length() < 3) // all wilderness! :O except maybe current one
 				break;
-			for (int j = 0; j < line.length(); j++) // loop through the characters
+			String name = "";
+			char character = '"';
+			String[] words = line.split(" ");
+			for (int j = 0; j < words.length; j++) // loop through the words
 			{
-				
+				if (words[j].matches(".:"))
+				{
+					if (!name.equals(""))
+					{
+						factions.put(character, name);
+						name = "";
+					}
+					character = words[j].charAt(0);
+				}
+				else
+					name += words[j];
 			}
-			
+			factions.put(character,  name);
 		}
-		
+
 		///// Add the current chunk's char + name if it's not already inside / isn't wilderness /////
-		if (!factions.containsValue(originFac))
+		if (!originFac.equals("Wilderness") && !factions.containsValue(originFac))
 			factions.put('+', originFac);
-			
-		
+
+		///// Decide on colors to use /////
+		HashMap<String, Integer> colors = new HashMap<String, Integer>();
+		int n = factions.size();
+		if (factions.size() % 2 == 0)
+			n++;
+		for (int i = 0; i < factions.size(); i++)
+		{
+			String name = (String) factions.values().toArray()[i];
+			if (name.equals("SafeZone"))
+				colors.put(name, 0xFFAA00);
+			else if (name.equals("WarZone"))
+				colors.put(name, 0xAA0000);
+			else
+				colors.put(name, 0xFFFFFF / n * (i + 1));
+		}
+
 		///// Parse the actual map and add the chunks to the 2D array /////
 		for (int z = 0; z < 8; z++)
 		{
@@ -67,7 +122,12 @@ public class FMapOverlay
 				if (x < 3 && z < 3)
 					continue;
 				int currX = originX - 19 + x;
-				
+				char currChar = currLine.charAt(x * 5 + 4);
+				String name = factions.get(currChar);
+				if (currZ == originZ && currX == originX)
+					name = originFac;
+				if (colors.get(name) != null)
+					map[x][z] = new Chunk(name, currX, currZ, colors.get(name)); 
 			}
 		}
 		return true;
@@ -86,6 +146,17 @@ public class FMapOverlay
 	public void reset()
 	{
 		this.lines.clear();
+	}
+	
+	public void fix()
+	{
+		this.isFixed = true;
+		this.fixedY = Minecraft.getMinecraft().thePlayer.posY - 1.6;
+	}
+	
+	public void unfix()
+	{
+		this.isFixed = false;
 	}
 
 	public int getSize() { return lines.size(); }
