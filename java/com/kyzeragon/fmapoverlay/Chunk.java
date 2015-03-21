@@ -62,8 +62,15 @@ public class Chunk
 		tess.draw();
 	}
 	
-	public boolean equals(Chunk other)
+	@Override
+	public boolean equals(Object obj)
 	{
-		return this.name.equals(other.name);
+		if (!this.name.equals(((Chunk)obj).name))
+			return false;
+		if (this.x != ((Chunk)obj).x)
+			return false;
+		if (this.z != ((Chunk)obj).z)
+			return false;
+		return true;
 	}
 }

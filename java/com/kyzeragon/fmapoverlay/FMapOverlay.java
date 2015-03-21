@@ -1,61 +1,57 @@
 package com.kyzeragon.fmapoverlay;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
 
 public class FMapOverlay 
 {
-	public boolean doneTakingLines;
 	private LinkedList<String> lines;
+	private LinkedList<Chunk> toDraw;
 	private HashMap<Character, String> factions;
-	private Chunk[][] map;
 	private boolean isFixed;
 	private double fixedY;
+	HashMap<String, Integer> colors; 
 
 	public FMapOverlay() 
 	{
 		this.lines = new LinkedList<String>();
+		this.toDraw = new LinkedList<Chunk>();
 		this.factions = new HashMap<Character, String>();
-		this.map = new Chunk[39][8];
-		this.doneTakingLines = false;
 		this.isFixed = false;
 		this.fixedY = 64;
+
+		this.colors = new HashMap<String, Integer>();
+		colors.put("SafeZone", 0xFFAA00);
+		colors.put("WarZone", 0xAA0000);
 	}
 
 	public void drawOverlay(Tessellator tess)
 	{
-		for (int z = 0; z < 8; z++)
+		for (Chunk chunk: this.toDraw)
 		{
-			for (int x = 0; x < 39; x++)
-			{
-				if (map[x][z] != null)
-				{
-					if (this.isFixed)
-						map[x][z].shadeChunk(tess, fixedY);
-					else
-						map[x][z].shadeChunk(tess);
-				}
-			}	
+			if (this.isFixed)
+				chunk.shadeChunk(tess, fixedY);
+			else
+				chunk.shadeChunk(tess);
 		}
 	}
 
 	public void addLine(String line)
 	{
 		lines.addLast(line);
-		System.out.println("Added line: " + line);
-		if (lines.size() >= 10 && this.doneTakingLines)
-			this.parseMap();
 	}
 
 	public boolean parseMap()
 	{
 		if (lines.size() < 1)
 			return false;
-		this.factions.clear();
-		this.map = new Chunk[39][8];
 		///// Read the first line to get the current faction /////
 		String line = lines.get(0);
 		int originX = Integer.parseInt(line.substring(line.indexOf("(") + 1, line.indexOf(",")));
@@ -64,14 +60,11 @@ public class FMapOverlay
 		String originFac = line.substring(nameStart, line.indexOf("§", nameStart));
 		System.out.println("Faction " + originFac + " at " + originX + " " + originZ);
 
-		///// Parse the bottom lines for the character: faction name /////
-		for (int i = 9; i < lines.size(); i++)
-		{ // §r§6/: SafeZone §r§f\: Kussen§r
-			line = lines.get(i);
-			line = line.replaceAll("§.?", ""); // /: SafeZone hi \: Kussen
-			System.out.println("Line: " + line);
-			if (line.length() < 3) // all wilderness! :O except maybe current one
-				break;
+		///// Parse the bottom line for the character: faction name /////
+		line = lines.get(9);
+		line = line.replaceAll("§.?", ""); // /: SafeZone hi \: Kussen
+		if (line.length() > 2) // all wilderness! :O except maybe current one
+		{
 			String name = "";
 			char character = '"';
 			String[] words = line.split(" ");
@@ -97,18 +90,13 @@ public class FMapOverlay
 			factions.put('+', originFac);
 
 		///// Decide on colors to use /////
-		HashMap<String, Integer> colors = new HashMap<String, Integer>();
 		int n = factions.size();
 		if (factions.size() % 2 == 0)
 			n++;
 		for (int i = 0; i < factions.size(); i++)
 		{
 			String name = (String) factions.values().toArray()[i];
-			if (name.equals("SafeZone"))
-				colors.put(name, 0xFFAA00);
-			else if (name.equals("WarZone"))
-				colors.put(name, 0xAA0000);
-			else
+			if (!this.colors.containsKey(name))
 				colors.put(name, 0xFFFFFF / n * (i + 1));
 		}
 
@@ -127,37 +115,45 @@ public class FMapOverlay
 				if (currZ == originZ && currX == originX)
 					name = originFac;
 				if (colors.get(name) != null)
-					map[x][z] = new Chunk(name, currX, currZ, colors.get(name)); 
+				{
+					System.out.println("Adding " + name + " at " + currX + " " + currZ);
+					Chunk toAdd = new Chunk(name, currX, currZ, colors.get(name));
+					//					map[x][z] = toAdd;
+					if (!this.toDraw.contains(toAdd))
+						this.toDraw.addFirst(toAdd);
+				}
 			}
 		}
 		return true;
 	}
-	//		§r§6____________.[ §r§2(-102,-43) §r§2Wilderness§r§6 ].______________§r
-	//		§r§6\§r§6N§r§6/§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r
-	//		§r§6W§r§6+§r§6E§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r
-	//		§r§6/§r§cS§r§6\§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r
-	//		§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r
-	//		§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§a\§r§b+§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r
-	//		§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§a\§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r
-	//		§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r
-	//		§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r§7-§r
-	//		§r§a\: Kussen§r
 
 	public void reset()
 	{
 		this.lines.clear();
+		//		this.map = new Chunk[39][8];
+		this.toDraw.clear();
 	}
-	
+
+	public void clearLines()
+	{
+		this.lines.clear();
+	}
+
 	public void fix()
 	{
 		this.isFixed = true;
 		this.fixedY = Minecraft.getMinecraft().thePlayer.posY - 1.6;
+		DecimalFormat df = new DecimalFormat();
+		df.setMaximumFractionDigits(1);
+		LiteModFMapOverlay.logMessage("§8[§2FMO§8] §aFixing faction map overlay at Y = " + df.format(this.fixedY));
 	}
-	
+
 	public void unfix()
 	{
 		this.isFixed = false;
+		LiteModFMapOverlay.logMessage("§8[§2FMO§8] §aUnfixed faction map overlay.");
 	}
 
 	public int getSize() { return lines.size(); }
+
 }
