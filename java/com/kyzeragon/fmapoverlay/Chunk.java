@@ -11,10 +11,6 @@ public class Chunk
 	private int x;
 	private int z;
 	private int color;
-	private Chunk north;
-	private Chunk east;
-	private Chunk south;
-	private Chunk west;
 	
 	public Chunk(String name, int x, int z, int color)
 	{
@@ -22,15 +18,6 @@ public class Chunk
 		this.x = x;
 		this.z = z;
 		this.color = color;
-	}
-	
-	public Chunk(String name, Chunk n, Chunk e, Chunk s, Chunk w)
-	{
-		this.name = name;
-		this.north = n;
-		this.east = e;
-		this.south = s;
-		this.west = w;
 	}
 	
 	public void shadeChunk(Tessellator tess)
@@ -47,6 +34,16 @@ public class Chunk
 		tess.addVertex(this.x * 16 + 16, y, this.z * 16 + 16);
 		tess.addVertex(this.x * 16 + 16, y, this.z * 16);
 		tess.draw();
+	}
+	
+	public void drawName(Tessellator tess)
+	{
+		this.drawName(tess, Minecraft.getMinecraft().thePlayer.posY);
+	}
+	
+	public void drawName(Tessellator tess, double y)
+	{
+		FMapOverlay.drawBillboard(this.x * 16 + 8, y, this.z * 16 + 8, 0x80000000, 0xFFFFFFFF, 0.04, this.name);
 	}
 	
 	public void lineChunk(Tessellator tess)

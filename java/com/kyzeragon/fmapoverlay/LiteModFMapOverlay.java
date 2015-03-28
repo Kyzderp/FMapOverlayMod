@@ -85,7 +85,14 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 
 		Tessellator tess = Tessellator.instance;
 		this.fmap.drawOverlay(tess);
+		
+		if (this.fmap.getDrawNames())
+			this.fmap.drawNames(tess);
+		
+		this.fmap.drawBillboard(0, 10, 0, 0x80000000, 0xFFFFFFFF, 0.02, "Test Billboard 0 10 0");
+		this.fmap.drawBillboard(10, 20, 10, 0x80000000, 0xFFFFFFFF, 0.02, "Test Billboard 10 20 10");
 
+		
 		GL11.glDepthFunc(GL11.GL_LEQUAL); // derp
 		GL11.glPopMatrix();
 
@@ -106,21 +113,31 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 	@Override
 	public void onPostRender(float partialTicks) {}
 
+//	§r§6______________.[ §r§2(-63,13) §r§fPhantom§r§6 ]._________________§r
+//	§r§6\N/§r§f\§r§7--§r§f#§r§7---§r§f???§r§7-§r§f???§r§6$§r§f%%=%%%%%%%====%&^^^^^§r
+//	§r§6W+E§r§f\§r§7--§r§f???§r§7-§r§f??§r§7-§r§f????§r§6$§r§f?==\\%%%%%======^^^^^§r
+//	§r§6/§r§cS§r§6\§r§fA§r§7--§r§f??§r§7---§r§fB§r§7-§r§fBB??§r§6$§r§f?==\%%%C%%====D=^^^^§r§6$§r
+//	§r§7--§r§fAAA§r§7---§r§fEEBBB§r§7-§r§fBB=§r§6$§r§f%%%%%C%C%%%%%F==^GG^§r§6$§r
+//	AAA\AH§r§7---§r§fEB======§r§6$§r§fJ§r§b+§r§fKK%%CC==%%%FD^^G^^§r§6$§r
+//	A§r§7-§r§fAA§r§7-§r§fA§r§7--§r§fEEE=BLL§r§7-§r§fM§r§6$§r§7--§r§fKKK%C%§r§7-§r§fNNOPQD^^G^^§r§6$§r
+//	AAA§r§7-§r§fA§r§7---§r§f==EBBBL§r§7-§r§6$$§r§7-§r§fKKRK%%%%N§r§dSSSS§r§fTTTTTT§r§6$§r
+//	AAAAA§r§7--§r§fU==BBBBB§r§6$$§r§7-§r§fR§r§7-§r§fRRV§r§7-§r§f=WXN§r§dSSSS§r§fTTTTTT§r§6$§r
+//	\: Huracan C: andrei N: Epsilon K: TheArchers W: piolavago J: BestMcPlayer O: Slickerzsx V: otaku B: loyalplayerz H: PHILIPPINES G: Nighthawks Q: GODS =: Craftlopious E: Dr3am R: teammangben T: InsulaColumba A: DiamondMinerz ^: CookieSyndicate U: PVO L: MonedyTDM §r§dS: Casual §r§f?: Crystalyzd M: TheNoobz P: STARE &: Dope /: Innocentio F: whack %: TheTeamExtreme X: PoraMine D: Pixelmon §r§6$: SafeZone §r§f#: xeroworld§r
+	
 	@Override
 	public boolean onChat(S02PacketChat chatPacket, IChatComponent chat, String message) 
 	{
 		if (this.sentCmd && message.matches(".*nknown.*ommand.*"))
-			return false;
-		if (message.matches("§r§6_+\\.\\[.*"))
 		{
-//			this.fmap.reset();
+			this.sentCmd = false;
+			return false;
+		}
+		if (message.matches("§r§6_+\\.\\[.*\\(-?[0-9]+.*"))
+		{
 			this.fmap.clearLines();
 			this.fmap.addLine(message);
 		}
-		else if (this.fmap.getSize() > 0 && this.fmap.getSize() < 10
-				&& message.matches("§r§[0-9a-f]?.?§r§.*"))
-			this.fmap.addLine(message);
-		else if (this.fmap.getSize() == 9)// && message.matches("§r§[0-9a-f]?.?: .*"))
+		else if (this.fmap.getSize() > 0 && this.fmap.getSize() < 10)
 			this.fmap.addLine(message);
 		return true;
 	}
@@ -164,6 +181,15 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 				{
 					this.fmap.unfix();
 				}
+				else if (tokens[1].equalsIgnoreCase("names"))
+				{
+					if (tokens.length == 3 && tokens[2].equalsIgnoreCase("on"))
+						this.fmap.setDrawNames(true);
+					else if (tokens.length == 3 && tokens[2].equalsIgnoreCase("off"))
+						this.fmap.setDrawNames(false);
+					else
+						this.logError("Usage: /fmo names <on|off>");
+				}
 				else if (tokens[1].equalsIgnoreCase("help"))
 				{
 					String[] commands = {"on - Turn Faction Map Overlay on",
@@ -203,7 +229,8 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 			{
 				this.logMessage("§8[§2FMO§8] §aDisplaying faction map overlay...");
 				this.isOn = true;
-				this.fmap.parseMap();
+				if (!this.fmap.parseMap())
+					this.logError("Error in displaying faction map overlay!");
 				this.justPressed = false;
 			}
 		}
