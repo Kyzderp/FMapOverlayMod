@@ -46,8 +46,8 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 		this.justPressed = false;
 		this.isOn = false;
 		this.fmap = new FMapOverlay();
-		this.loadMapBinding = new KeyBinding("key.fmapoverlay.shortcut", Keyboard.KEY_L, "key.categories.litemods");
-		LiteLoader.getInput().registerKeyBinding(this.loadMapBinding);
+		LiteModFMapOverlay.loadMapBinding = new KeyBinding("key.fmapoverlay.shortcut", Keyboard.KEY_L, "key.categories.litemods");
+		LiteLoader.getInput().registerKeyBinding(LiteModFMapOverlay.loadMapBinding);
 	}
 
 	@Override
@@ -89,8 +89,8 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 		if (this.fmap.getDrawNames())
 			this.fmap.drawNames(tess);
 		
-		this.fmap.drawBillboard(0, 10, 0, 0x80000000, 0xFFFFFFFF, 0.02, "Test Billboard 0 10 0");
-		this.fmap.drawBillboard(10, 20, 10, 0x80000000, 0xFFFFFFFF, 0.02, "Test Billboard 10 20 10");
+//		FMapOverlay.drawBillboard(0, 10, 0, 0x80000000, 0xFFFFFFFF, 0.02, "Test Billboard 0 10 0");
+//		FMapOverlay.drawBillboard(10, 20, 10, 0x80000000, 0xFFFFFFFF, 0.02, "Test Billboard 10 20 10");
 
 		
 		GL11.glDepthFunc(GL11.GL_LEQUAL); // derp
@@ -154,61 +154,61 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 				if (tokens[1].equalsIgnoreCase("on"))
 				{
 					this.isOn = true;
-					this.logMessage("§8[§2FMO§8] §aFaction Map Overlay: §2ON");
+					LiteModFMapOverlay.logMessage("Faction Map Overlay: §2ON", true);
 				}
 				else if (tokens[1].equalsIgnoreCase("off"))
 				{
 					this.isOn = false;
-					this.logMessage("§8[§2FMO§8] §aFaction Map Overlay: §4OFF");
+					LiteModFMapOverlay.logMessage("Faction Map Overlay: §4OFF", true);
 				}
 				else if (tokens[1].equalsIgnoreCase("display"))
 				{
 					if (this.fmap.parseMap())
-						this.logMessage("§8[§2FMO§8] §aDisplaying faction map overlay");
+						LiteModFMapOverlay.logMessage("Displaying faction map overlay", true);
 					else
-						this.logError("Unable to display overlay! Run /f map first");
+						LiteModFMapOverlay.logError("Unable to display overlay! Run /f map first");
 				}
 				else if (tokens[1].equalsIgnoreCase("clear"))
 				{
 					this.fmap.reset();
-					this.logMessage("§8[§2FMO§8] §aFaction map overlay cleared.");
+					LiteModFMapOverlay.logMessage("Faction map overlay cleared.", true);
 				}
-				else if (tokens[1].equalsIgnoreCase("fix"))
+				else if (tokens[1].equalsIgnoreCase("lock") || tokens[1].equalsIgnoreCase("fix"))
 				{
 					this.fmap.fix();
 				}
-				else if (tokens[1].equalsIgnoreCase("unfix"))
+				else if (tokens[1].equalsIgnoreCase("unlock") || tokens[1].equalsIgnoreCase("unfix"))
 				{
 					this.fmap.unfix();
 				}
-				else if (tokens[1].equalsIgnoreCase("names"))
+/*				else if (tokens[1].equalsIgnoreCase("names"))
 				{
 					if (tokens.length == 3 && tokens[2].equalsIgnoreCase("on"))
 						this.fmap.setDrawNames(true);
 					else if (tokens.length == 3 && tokens[2].equalsIgnoreCase("off"))
 						this.fmap.setDrawNames(false);
 					else
-						this.logError("Usage: /fmo names <on|off>");
-				}
+						LiteModFMapOverlay.logError("Usage: /fmo names <on|off>");
+				}*/
 				else if (tokens[1].equalsIgnoreCase("help"))
 				{
 					String[] commands = {"on - Turn Faction Map Overlay on",
 							"off - Turn Faction Map Overlay off",
 							"clear - Clear the overlay display",
 					"help - This help message. Hurrdurr."};
-					this.logMessage(this.getName() + " [v" + this.getVersion() + "] commands:");
+					LiteModFMapOverlay.logMessage(this.getName() + " [v" + this.getVersion() + "] commands:", false);
 					for (int i = 0; i < commands.length; i++)
-						this.logMessage("/fmo " + commands[i]);
+						LiteModFMapOverlay.logMessage("/fmo " + commands[i], false);
 				}
 				else
 				{
-					this.logError("Invalid parameters. See /fmo help for help with commands.");
+					LiteModFMapOverlay.logError("Invalid parameters. See /fmo help for help with commands.");
 				}
 			}
 			else
 			{
-				this.logMessage(this.getName() + " [v" + this.getVersion() + "] by Kyzeragon");
-				this.logMessage("Type /fmo help for commands.");
+				LiteModFMapOverlay.logMessage(this.getName() + " [v" + this.getVersion() + "] by Kyzeragon", false);
+				LiteModFMapOverlay.logMessage("Type /fmo help for commands.", false);
 			}
 		}
 	}
@@ -216,21 +216,21 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 	@Override
 	public void onTick(Minecraft minecraft, float partialTicks, boolean inGame, boolean clock) 
 	{
-		if (this.loadMapBinding.isPressed())
+		if (LiteModFMapOverlay.loadMapBinding.isPressed())
 		{
 			System.out.println("pressed");
 			if (!this.justPressed) // first time pressing
 			{
-				this.logMessage("§8[§2FMO§8] §aAuto-running /f map... press again to display overlay.");
+				LiteModFMapOverlay.logMessage("Auto-running /f map... press again to display overlay.", true);
 				minecraft.thePlayer.sendChatMessage("/f map");
 				this.justPressed = true;
 			}
 			else // second time pressing
 			{
-				this.logMessage("§8[§2FMO§8] §aDisplaying faction map overlay...");
+				LiteModFMapOverlay.logMessage("Displaying faction map overlay...", true);
 				this.isOn = true;
 				if (!this.fmap.parseMap())
-					this.logError("Error in displaying faction map overlay!");
+					LiteModFMapOverlay.logError("Error in displaying faction map overlay!");
 				this.justPressed = false;
 			}
 		}
@@ -240,8 +240,10 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 	 * Logs the message to the user
 	 * @param message The message to log
 	 */
-	public static void logMessage(String message)
+	public static void logMessage(String message, boolean prefix)
 	{// "§8[§2FMO§8] §a" + 
+		if (prefix)
+			message = "§8[§2FMO§8] §a" + message;
 		ChatComponentText displayMessage = new ChatComponentText(message);
 		displayMessage.setChatStyle((new ChatStyle()).setColor(EnumChatFormatting.GREEN));
 		Minecraft.getMinecraft().thePlayer.addChatComponentMessage(displayMessage);
