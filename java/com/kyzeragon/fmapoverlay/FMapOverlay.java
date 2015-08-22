@@ -14,7 +14,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 
-public class FMapOverlay 
+public class FMapOverlay //TODO: work with /f map on
 {
 	private LinkedList<String> lines;
 	private LinkedList<Chunk> toDraw;
@@ -63,7 +63,6 @@ public class FMapOverlay
 	public void addLine(String line)
 	{
 		lines.addLast(line);
-		System.out.println("Added line: " + line);
 	}
 
 	public boolean parseMap()
@@ -72,7 +71,7 @@ public class FMapOverlay
 			return false;
 		///// Read the first line to get the current faction /////
 //		§r§6______________.[ §r§2(-63,13) §r§fPhantom§r§6 ]._________________§r
-//		Added line: §r§6______________.[ §r§2(-16,9) §r§6SafeZone ]._________________§r
+//		§r§6______________.[ §r§2(-16,9) §r§6SafeZone ]._________________§r
 //		§r§6___________.[ §r§2(-108,-242) Wilderness§r§6 ].______________§r
 		String line = lines.get(0);
 		int originX = Integer.parseInt(line.substring(line.indexOf("(") + 1, line.indexOf(",")));
@@ -81,7 +80,6 @@ public class FMapOverlay
 		String originFac = line.substring(nameStart, line.indexOf("]", nameStart));
 		originFac = originFac.replaceAll("§.?", "");
 		originFac = originFac.trim();
-		System.out.println("Faction " + originFac + " at " + originX + " " + originZ);
 
 		///// Parse the bottom line for the character: faction name /////
 		line = lines.get(9);
@@ -146,7 +144,6 @@ public class FMapOverlay
 					name = originFac;
 				if (colors.get(name) != null)
 				{
-//					System.out.println("Adding " + name + " at " + currX + " " + currZ);
 					Chunk toAdd = new Chunk(name, currX, currZ, colors.get(name));
 					if (!this.toDraw.contains(toAdd))
 						this.toDraw.addFirst(toAdd);
@@ -174,13 +171,13 @@ public class FMapOverlay
 		this.fixedY = Minecraft.getMinecraft().thePlayer.posY - 1.6;
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(1);
-		LiteModFMapOverlay.logMessage("§8[§2FMO§8] §aFixing faction map overlay at Y = " + df.format(this.fixedY));
+		LiteModFMapOverlay.logMessage("Locked faction map overlay at Y = " + df.format(this.fixedY), true);
 	}
 
 	public void unfix()
 	{
 		this.isFixed = false;
-		LiteModFMapOverlay.logMessage("§8[§2FMO§8] §aUnfixed faction map overlay.");
+		LiteModFMapOverlay.logMessage("Unlocked faction map overlay.", true);
 	}
 
 	/**

@@ -3,5 +3,5 @@
     "mcversion": "${litemodversion}",
     "revision": "${build.number}",
     "author": "${author}",
-    "description": "A Litemod for TE to filter certain chat channels"
+    "description": "A Litemod for parsing Factions map"
 }

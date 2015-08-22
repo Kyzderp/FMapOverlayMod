@@ -37,7 +37,7 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 	public String getName() { return "Faction Map Overlay"; }
 
 	@Override
-	public String getVersion() { return "0.9.0"; }
+	public String getVersion() { return "0.9.2"; }
 
 	@Override
 	public void init(File configPath) 
@@ -46,7 +46,7 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 		this.justPressed = false;
 		this.isOn = false;
 		this.fmap = new FMapOverlay();
-		this.loadMapBinding = new KeyBinding("key.fmapoverlay.shortcut", Keyboard.KEY_L, "key.categories.litemods");
+		this.loadMapBinding = new KeyBinding("key.fmapoverlay.shortcut", Keyboard.CHAR_NONE, "key.categories.litemods");
 		LiteLoader.getInput().registerKeyBinding(this.loadMapBinding);
 	}
 
@@ -85,14 +85,14 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 
 		Tessellator tess = Tessellator.instance;
 		this.fmap.drawOverlay(tess);
-		
+
 		if (this.fmap.getDrawNames())
 			this.fmap.drawNames(tess);
-		
-		this.fmap.drawBillboard(0, 10, 0, 0x80000000, 0xFFFFFFFF, 0.02, "Test Billboard 0 10 0");
-		this.fmap.drawBillboard(10, 20, 10, 0x80000000, 0xFFFFFFFF, 0.02, "Test Billboard 10 20 10");
 
-		
+		//		this.fmap.drawBillboard(0, 10, 0, 0x80000000, 0xFFFFFFFF, 0.02, "Test Billboard 0 10 0");
+		//		this.fmap.drawBillboard(10, 20, 10, 0x80000000, 0xFFFFFFFF, 0.02, "Test Billboard 10 20 10");
+
+
 		GL11.glDepthFunc(GL11.GL_LEQUAL); // derp
 		GL11.glPopMatrix();
 
@@ -113,17 +113,17 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 	@Override
 	public void onPostRender(float partialTicks) {}
 
-//	§r§6______________.[ §r§2(-63,13) §r§fPhantom§r§6 ]._________________§r
-//	§r§6\N/§r§f\§r§7--§r§f#§r§7---§r§f???§r§7-§r§f???§r§6$§r§f%%=%%%%%%%====%&^^^^^§r
-//	§r§6W+E§r§f\§r§7--§r§f???§r§7-§r§f??§r§7-§r§f????§r§6$§r§f?==\\%%%%%======^^^^^§r
-//	§r§6/§r§cS§r§6\§r§fA§r§7--§r§f??§r§7---§r§fB§r§7-§r§fBB??§r§6$§r§f?==\%%%C%%====D=^^^^§r§6$§r
-//	§r§7--§r§fAAA§r§7---§r§fEEBBB§r§7-§r§fBB=§r§6$§r§f%%%%%C%C%%%%%F==^GG^§r§6$§r
-//	AAA\AH§r§7---§r§fEB======§r§6$§r§fJ§r§b+§r§fKK%%CC==%%%FD^^G^^§r§6$§r
-//	A§r§7-§r§fAA§r§7-§r§fA§r§7--§r§fEEE=BLL§r§7-§r§fM§r§6$§r§7--§r§fKKK%C%§r§7-§r§fNNOPQD^^G^^§r§6$§r
-//	AAA§r§7-§r§fA§r§7---§r§f==EBBBL§r§7-§r§6$$§r§7-§r§fKKRK%%%%N§r§dSSSS§r§fTTTTTT§r§6$§r
-//	AAAAA§r§7--§r§fU==BBBBB§r§6$$§r§7-§r§fR§r§7-§r§fRRV§r§7-§r§f=WXN§r§dSSSS§r§fTTTTTT§r§6$§r
-//	\: Huracan C: andrei N: Epsilon K: TheArchers W: piolavago J: BestMcPlayer O: Slickerzsx V: otaku B: loyalplayerz H: PHILIPPINES G: Nighthawks Q: GODS =: Craftlopious E: Dr3am R: teammangben T: InsulaColumba A: DiamondMinerz ^: CookieSyndicate U: PVO L: MonedyTDM §r§dS: Casual §r§f?: Crystalyzd M: TheNoobz P: STARE &: Dope /: Innocentio F: whack %: TheTeamExtreme X: PoraMine D: Pixelmon §r§6$: SafeZone §r§f#: xeroworld§r
-	
+	//	§r§6______________.[ §r§2(-63,13) §r§fPhantom§r§6 ]._________________§r
+	//	§r§6\N/§r§f\§r§7--§r§f#§r§7---§r§f???§r§7-§r§f???§r§6$§r§f%%=%%%%%%%====%&^^^^^§r
+	//	§r§6W+E§r§f\§r§7--§r§f???§r§7-§r§f??§r§7-§r§f????§r§6$§r§f?==\\%%%%%======^^^^^§r
+	//	§r§6/§r§cS§r§6\§r§fA§r§7--§r§f??§r§7---§r§fB§r§7-§r§fBB??§r§6$§r§f?==\%%%C%%====D=^^^^§r§6$§r
+	//	§r§7--§r§fAAA§r§7---§r§fEEBBB§r§7-§r§fBB=§r§6$§r§f%%%%%C%C%%%%%F==^GG^§r§6$§r
+	//	AAA\AH§r§7---§r§fEB======§r§6$§r§fJ§r§b+§r§fKK%%CC==%%%FD^^G^^§r§6$§r
+	//	A§r§7-§r§fAA§r§7-§r§fA§r§7--§r§fEEE=BLL§r§7-§r§fM§r§6$§r§7--§r§fKKK%C%§r§7-§r§fNNOPQD^^G^^§r§6$§r
+	//	AAA§r§7-§r§fA§r§7---§r§f==EBBBL§r§7-§r§6$$§r§7-§r§fKKRK%%%%N§r§dSSSS§r§fTTTTTT§r§6$§r
+	//	AAAAA§r§7--§r§fU==BBBBB§r§6$$§r§7-§r§fR§r§7-§r§fRRV§r§7-§r§f=WXN§r§dSSSS§r§fTTTTTT§r§6$§r
+	//	\: Huracan C: andrei N: Epsilon K: TheArchers W: piolavago J: BestMcPlayer O: Slickerzsx V: otaku B: loyalplayerz H: PHILIPPINES G: Nighthawks Q: GODS =: Craftlopious E: Dr3am R: teammangben T: InsulaColumba A: DiamondMinerz ^: CookieSyndicate U: PVO L: MonedyTDM §r§dS: Casual §r§f?: Crystalyzd M: TheNoobz P: STARE &: Dope /: Innocentio F: whack %: TheTeamExtreme X: PoraMine D: Pixelmon §r§6$: SafeZone §r§f#: xeroworld§r
+
 	@Override
 	public boolean onChat(S02PacketChat chatPacket, IChatComponent chat, String message) 
 	{
@@ -154,30 +154,30 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 				if (tokens[1].equalsIgnoreCase("on"))
 				{
 					this.isOn = true;
-					this.logMessage("§8[§2FMO§8] §aFaction Map Overlay: §2ON");
+					this.logMessage("Faction Map Overlay: §2ON", true);
 				}
 				else if (tokens[1].equalsIgnoreCase("off"))
 				{
 					this.isOn = false;
-					this.logMessage("§8[§2FMO§8] §aFaction Map Overlay: §4OFF");
+					this.logMessage("Faction Map Overlay: §4OFF", true);
 				}
 				else if (tokens[1].equalsIgnoreCase("display"))
 				{
 					if (this.fmap.parseMap())
-						this.logMessage("§8[§2FMO§8] §aDisplaying faction map overlay");
+						this.logMessage("Displaying faction map overlay", true);
 					else
 						this.logError("Unable to display overlay! Run /f map first");
 				}
 				else if (tokens[1].equalsIgnoreCase("clear"))
 				{
 					this.fmap.reset();
-					this.logMessage("§8[§2FMO§8] §aFaction map overlay cleared.");
+					this.logMessage("Faction map overlay cleared.", true);
 				}
-				else if (tokens[1].equalsIgnoreCase("fix"))
+				else if (tokens[1].toLowerCase().matches("lock|fix"))
 				{
 					this.fmap.fix();
 				}
-				else if (tokens[1].equalsIgnoreCase("unfix"))
+				else if (tokens[1].toLowerCase().matches("unlock|unfix"))
 				{
 					this.fmap.unfix();
 				}
@@ -195,10 +195,12 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 					String[] commands = {"on - Turn Faction Map Overlay on",
 							"off - Turn Faction Map Overlay off",
 							"clear - Clear the overlay display",
+							"lock - Lock the overlay at your current feet position",
+							"unlock - Unlock the overlay so it follows you",
 					"help - This help message. Hurrdurr."};
-					this.logMessage(this.getName() + " [v" + this.getVersion() + "] commands:");
+					this.logMessage(this.getName() + " [v" + this.getVersion() + "] commands:", false);
 					for (int i = 0; i < commands.length; i++)
-						this.logMessage("/fmo " + commands[i]);
+						this.logMessage("/fmo " + commands[i], false);
 				}
 				else
 				{
@@ -207,8 +209,8 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 			}
 			else
 			{
-				this.logMessage(this.getName() + " [v" + this.getVersion() + "] by Kyzeragon");
-				this.logMessage("Type /fmo help for commands.");
+				this.logMessage(this.getName() + " [v" + this.getVersion() + "] by Kyzeragon", false);
+				this.logMessage("Type /fmo help for commands.", false);
 			}
 		}
 	}
@@ -218,20 +220,27 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 	{
 		if (this.loadMapBinding.isPressed())
 		{
-			System.out.println("pressed");
-			if (!this.justPressed) // first time pressing
+			if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
 			{
-				this.logMessage("§8[§2FMO§8] §aAuto-running /f map... press again to display overlay.");
-				minecraft.thePlayer.sendChatMessage("/f map");
-				this.justPressed = true;
+				this.fmap.reset();
+				this.logMessage("Faction map overlay cleared.", true);
 			}
-			else // second time pressing
+			else
 			{
-				this.logMessage("§8[§2FMO§8] §aDisplaying faction map overlay...");
-				this.isOn = true;
-				if (!this.fmap.parseMap())
-					this.logError("Error in displaying faction map overlay!");
-				this.justPressed = false;
+				if (!this.justPressed) // first time pressing
+				{
+					this.logMessage("Auto-running /f map... press again to display overlay.", true);
+					minecraft.thePlayer.sendChatMessage("/f map");
+					this.justPressed = true;
+				}
+				else // second time pressing
+				{
+					this.logMessage("Displaying faction map overlay...", true);
+					this.isOn = true;
+					if (!this.fmap.parseMap())
+						this.logError("Error in displaying faction map overlay!");
+					this.justPressed = false;
+				}
 			}
 		}
 	}
@@ -240,8 +249,10 @@ public class LiteModFMapOverlay implements OutboundChatListener, ChatFilter, Pos
 	 * Logs the message to the user
 	 * @param message The message to log
 	 */
-	public static void logMessage(String message)
+	public static void logMessage(String message, boolean prefix)
 	{// "§8[§2FMO§8] §a" + 
+		if (prefix)
+			message = "§8[§2FMO§8] §a" + message;
 		ChatComponentText displayMessage = new ChatComponentText(message);
 		displayMessage.setChatStyle((new ChatStyle()).setColor(EnumChatFormatting.GREEN));
 		Minecraft.getMinecraft().thePlayer.addChatComponentMessage(displayMessage);
